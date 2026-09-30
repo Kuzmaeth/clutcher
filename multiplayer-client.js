@@ -3,7 +3,14 @@
 
   const params = new URLSearchParams(location.search);
   const localHost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  const endpoint = params.get('mp') || (localHost ? 'ws://127.0.0.1:8787/ws' : 'wss://ws.mojadora.com/ws');
+  // Remote relay endpoints, tried in order. The first is a Cloudflare quick
+  // tunnel on the Oracle VM; quick-tunnel hostnames change when the tunnel
+  // restarts, so later entries are stable fallbacks. `?mp=` still overrides all.
+  const remoteEndpoints = [
+    'wss://reflect-clear-preview-neon.trycloudflare.com/ws',
+    'wss://ws.mojadora.com/ws',
+  ];
+  const endpoint = params.get('mp') || (localHost ? 'ws://127.0.0.1:8787/ws' : remoteEndpoints[0]);
   // The bundle's playerName() reads 'clutcher_name' (written by the settings
   // menu); this client used to read only 'clutcher_mp_name'. Two keys meant the
   // local row showed "Player" while the remote showed a per-profile random, so
